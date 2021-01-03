@@ -16,7 +16,7 @@ export interface UserDetails {
   avatar: urllike;
 }
 
-export interface FollwedManga {
+export interface FollowedManga {
   userId: userid;
   mangaId: mangaid;
   mangaTitle: string;

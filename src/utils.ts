@@ -1,4 +1,4 @@
-import {Serializable} from './types';
+import {Serializable} from './api/common';
 
 export const multipart = {
   boundary: (): string => 'mfa' + Math.floor(Math.random() * 1000).toString(),

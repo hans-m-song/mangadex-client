@@ -10,16 +10,17 @@ import {
   PaginatedQuery,
 } from './query';
 import {
+  MangaDetails,
+  GroupDetails,
+  Tag,
+  Relation,
   ChapterSummary,
   ChapterDetails,
   MangaRating,
   ChapterList,
-} from './response/chapters';
-import {GroupDetails} from './response/group';
-import {MangaDetails} from './response/manga';
-import {Relation} from './response/relations';
-import {Tag} from './response/tag';
-import {FollwedManga as FollowedManga, UserDetails} from './response/user';
+  FollowedManga,
+  UserDetails,
+} from './response';
 
 const BASE_API = 'api/v2';
 
@@ -94,8 +95,7 @@ export const api = {
   group: (id: number) => {
     const path = `group/${id}`;
     return {
-      details: (query?: IncludeChaptersQuery) =>
-        get<GroupDetails>(path, query),
+      details: (query?: IncludeChaptersQuery) => get<GroupDetails>(path, query),
       chapters: (query?: PaginatedQuery) =>
         get<ChapterList>(`${path}/chapters`, query),
     };
@@ -103,17 +103,12 @@ export const api = {
   user: (id: number) => {
     const path = `user/${id}`;
     return {
-      details: (query?: IncludeChaptersQuery) =>
-        get<UserDetails>(path, query),
+      details: (query?: IncludeChaptersQuery) => get<UserDetails>(path, query),
       chapters: (query?: PaginatedQuery) =>
         get<ChapterList>(`${path}/chapters`, query),
-      followedManga: () =>
-        get<FollowedManga[]>(`${path}/followed-manga`),
+      followedManga: () => get<FollowedManga[]>(`${path}/followed-manga`),
       followedUpdates: (query?: FollowedUpdatesQuery) =>
-        get<ChapterSummary[]>(
-          `${path}/followed-updates`,
-          query,
-        ),
+        get<ChapterSummary[]>(`${path}/followed-updates`, query),
       ratings: () => get<MangaRating[]>(`${path}/ratings`),
       mangaDetails: (mangaId?: number) =>
         get(`${path}/manga${mangaId ? `/${mangaId}` : ''}`),
@@ -122,9 +117,6 @@ export const api = {
   },
   tag: (id: number) => get<Tag>(`tag/${id}`),
   tags: () => get<Record<tagid, Tag>>(`tag`),
-  relations: () =>
-    get<Record<relationid, Relation>>(
-      `relations`,
-    ),
+  relations: () => get<Record<relationid, Relation>>(`relations`),
   // follows: () => get(`follows`), // not needed
 };
