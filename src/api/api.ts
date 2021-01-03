@@ -45,80 +45,86 @@ const fetch = async <R>(config: AxiosRequestConfig): Promise<R> => {
 const get = async <R, Q extends Serializable = Serializable>(
   path: string,
   query?: Q,
-): Promise<R> => {
-  const url = makeUrl(path, query);
+): Promise<MangadexResponse<R>> => {
+  const url = makeUrl(`${BASE_API}/${path}`, query);
   return fetch({url, method: 'GET'});
 };
 
 const post = async <R, Q extends Serializable = Serializable>(
   path: string,
-  data: any,
+  body: any,
+  query?: Q,
+): Promise<MangadexResponse<R>> => {
+  const url = makeUrl(`${BASE_API}/${path}`, query);
+  return fetch({url, method: 'POST', data: body});
+};
+
+const postAjax = async <R, Q extends Serializable = Serializable>(
+  path: string,
+  body: any,
   query?: Q,
 ): Promise<R> => {
   const url = makeUrl(path, query);
-  return fetch({url, method: 'POST', data});
+  const boundary = multipart.boundary();
+  return fetch({
+    url,
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': `multipart/form-data boundary=${boundary}`,
+    },
+    data: multipart.payload(boundary, body),
+  });
 };
 
 export const api = {
-  login: async (body: LoginBody) => {
-    const url = makeUrl('ajax/actions.ajax.php', {function: 'login'});
-    const boundary = multipart.boundary();
-    const config: AxiosRequestConfig = {
-      url,
-      method: 'post',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': `multipart/form-data boundary=${boundary}`,
-      },
-      data: multipart.payload(boundary, body),
-    };
-    await axios(config);
-  },
+  login: async (body: LoginBody) =>
+    postAjax('ajax/actions.ajax.php', body, {function: 'login'}),
   manga: (id: number) => {
-    const path = `${BASE_API}/manga/${id}`;
+    const path = `manga/${id}`;
     return {
-      details: () => get<MangadexResponse<MangaDetails>>(path),
+      details: () => get<MangaDetails>(path),
       chapters: (query?: PaginatedQuery) =>
-        get<MangadexResponse<ChapterList>>(`${path}/chapters`, query),
+        get<ChapterList>(`${path}/chapters`, query),
       covers: () => get(`${path}/covers`),
     };
   },
   chapter: (id: number | string, query?: ChapterQuery) =>
-    get<MangadexResponse<ChapterDetails>>(`${BASE_API}/chapter/${id}`, query),
+    get<ChapterDetails>(`chapter/${id}`, query),
   group: (id: number) => {
-    const path = `${BASE_API}/group/${id}`;
+    const path = `group/${id}`;
     return {
       details: (query?: IncludeChaptersQuery) =>
-        get<MangadexResponse<GroupDetails>>(path, query),
+        get<GroupDetails>(path, query),
       chapters: (query?: PaginatedQuery) =>
-        get<MangadexResponse<ChapterList>>(`${path}/chapters`, query),
+        get<ChapterList>(`${path}/chapters`, query),
     };
   },
   user: (id: number) => {
-    const path = `${BASE_API}/user/${id}`;
+    const path = `user/${id}`;
     return {
       details: (query?: IncludeChaptersQuery) =>
-        get<MangadexResponse<UserDetails>>(path, query),
+        get<UserDetails>(path, query),
       chapters: (query?: PaginatedQuery) =>
-        get<MangadexResponse<ChapterList>>(`${path}/chapters`, query),
+        get<ChapterList>(`${path}/chapters`, query),
       followedManga: () =>
-        get<MangadexResponse<FollowedManga[]>>(`${path}/followed-manga`),
+        get<FollowedManga[]>(`${path}/followed-manga`),
       followedUpdates: (query?: FollowedUpdatesQuery) =>
-        get<MangadexResponse<ChapterSummary[]>>(
+        get<ChapterSummary[]>(
           `${path}/followed-updates`,
           query,
         ),
-      ratings: () => get<MangadexResponse<MangaRating[]>>(`${path}/ratings`),
+      ratings: () => get<MangaRating[]>(`${path}/ratings`),
       mangaDetails: (mangaId?: number) =>
         get(`${path}/manga${mangaId ? `/${mangaId}` : ''}`),
       marker: (body: MarkerBody) => post(`${path}/marker`, body),
     };
   },
-  tag: (id: number) => get<MangadexResponse<Tag>>(`${BASE_API}/tag/${id}`),
-  tags: () => get<MangadexResponse<Record<tagid, Tag>>>(`${BASE_API}/tag`),
+  tag: (id: number) => get<Tag>(`tag/${id}`),
+  tags: () => get<Record<tagid, Tag>>(`tag`),
   relations: () =>
-    get<MangadexResponse<Record<relationid, Relation>>>(
-      `${BASE_API}/relations`,
+    get<Record<relationid, Relation>>(
+      `relations`,
     ),
-  // follows: () => get(`${BASE_API}/follows`), // not needed
+  // follows: () => get(`follows`), // not needed
 };
