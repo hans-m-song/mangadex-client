@@ -1,4 +1,5 @@
-import {FollowType, HentaiVisibility, Serializable} from '../types';
+import {FollowType, HentaiVisibility} from '../types';
+import {Serializable} from './common';
 
 export interface LoginBody extends Serializable {
   login_username: string;
