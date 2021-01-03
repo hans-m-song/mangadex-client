@@ -1,10 +1,9 @@
-export type MangadexResponse<T> =
-  | {
-      code: 200;
-      status: 'OK';
-      data: T;
-    }
-  | {code: 403 | 404; status: 'error'; message: string};
+export interface MangadexResponse<T> {
+  code: 200;
+  status: 'OK';
+  data: T;
+}
+// {code: 403 | 404; status: 'error'; message: string};
 
 export interface Serializable {
   [key: string]: string | boolean | number | undefined;
