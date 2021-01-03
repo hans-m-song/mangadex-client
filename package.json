@@ -15,15 +15,20 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-redux": "^7.1.15",
     "axios": "^0.21.1",
-    "express": "^4.17.1",
-    "http-proxy-middleware": "^1.0.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.2",
     "react-scripts": "4.0.1",
     "typescript": "^3.8.3"
   },
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^1.0.6"
+  },
   "scripts": {
+    "dev": "concurrently -n react,proxy \"npm run start\" \"npm run proxy\"",
+    "proxy": "node proxy.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
